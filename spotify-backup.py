@@ -14,6 +14,7 @@ import urllib.parse
 import urllib.request
 import webbrowser
 
+
 logging.basicConfig(level=20, datefmt='%I:%M:%S', format='[%(asctime)s] %(message)s')
 
 
@@ -142,7 +143,7 @@ def main():
     # If they didn't give a filename, then just prompt them. (They probably just double-clicked.)
     while not args.file:
         args.file = input('Enter a file name (e.g. playlists.txt): ')
-        args.format = args.file.split('.')[-1]
+        args.format = args.file.rsplit('.')[-1]
 
     # Log into the Spotify API.
     if args.token:
@@ -204,17 +205,18 @@ def main():
         # Tab-separated file.
         else:
             for playlist in playlists:
-                f.write(playlist['name'] + '\r\n')
+                f.write(playlist['name'] + os.linesep)
                 for track in playlist['tracks']:
                     if track['track'] is None:
                         continue
-                    f.write('{name}\t{artists}\t{album}\t{uri}\r\n'.format(
+                    f.write('{name}\t{artists}\t{album}\t{uri}{eol}'.format(
                         uri=track['track']['uri'],
                         name=track['track']['name'],
                         artists=', '.join([artist['name'] for artist in track['track']['artists']]),
-                        album=track['track']['album']['name']
+                        album=track['track']['album']['name'],
+                        eol=os.linesep
                     ))
-                f.write('\r\n')
+                f.write(os.linesep)
     logging.info('Wrote file: ' + args.file)
 
 if __name__ == '__main__':
