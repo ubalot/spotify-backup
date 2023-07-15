@@ -143,7 +143,9 @@ def main():
 
     # If they didn't give a filename, then just prompt them. (They probably just double-clicked.)
     while not args.file:
-        args.file = input('Enter a file name (e.g. playlists.txt): ')
+        args.file = input('Enter a file name (e.g. spotify_playlists.json): ')
+        if len(args.file) == 0:
+            args.file = 'spotify_playlists.json'
         args.format = args.file.rsplit('.')[-1]
 
     # Log into the Spotify API.
