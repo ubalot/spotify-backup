@@ -137,7 +137,6 @@ def main():
                                                              + '`playlist-read-private` permission)')
     parser.add_argument('--dump', default='playlists', choices=['liked,playlists', 'playlists,liked', 'playlists', 'liked'],
                         help='dump playlists or liked songs, or both (default: playlists)')
-    parser.add_argument('--format', default='txt', choices=['json', 'txt'], help='output format (default: txt)')
     parser.add_argument('file', help='output filename', nargs='?')
     args = parser.parse_args()
 
@@ -183,43 +182,25 @@ def main():
     # Write the file.
     logging.info('Writing files...')
     with open(args.file, 'w', encoding='utf-8') as f:
-        # JSON file.
-        if args.format == 'json':
-            playlists_obj = []
-            for playlist in playlists:
-                obj = {}
-                obj["playlist"] = playlist["name"]
-                obj["tracks"] = []
-                for track in playlist["tracks"]:
-                    if track["track"] is None:
-                        continue
-                    obj["tracks"].append(
-                        {
-                            "song": track["track"]["name"],
-                            "artists": ", ".join(
-                                [artist["name"] for artist in track["track"]["artists"]]
-                            ),
-                            "album": track["track"]["album"]["name"],
-                        }
-                    )
-                playlists_obj.append(obj)
-            json.dump(playlists_obj, f, indent=4)
-
-        # Tab-separated file.
-        else:
-            for playlist in playlists:
-                f.write(playlist['name'] + os.linesep)
-                for track in playlist['tracks']:
-                    if track['track'] is None:
-                        continue
-                    f.write('{name}\t{artists}\t{album}\t{uri}{eol}'.format(
-                        uri=track['track']['uri'],
-                        name=track['track']['name'],
-                        artists=', '.join([artist['name'] for artist in track['track']['artists']]),
-                        album=track['track']['album']['name'],
-                        eol=os.linesep
-                    ))
-                f.write(os.linesep)
+        playlists_obj = []
+        for playlist in playlists:
+            obj = {}
+            obj["playlist"] = playlist["name"]
+            obj["tracks"] = []
+            for track in playlist["tracks"]:
+                if track["track"] is None:
+                    continue
+                obj["tracks"].append(
+                    {
+                        "song": track["track"]["name"],
+                        "artists": ", ".join(
+                            [artist["name"] for artist in track["track"]["artists"]]
+                        ),
+                        "album": track["track"]["album"]["name"],
+                    }
+                )
+            playlists_obj.append(obj)
+        json.dump(playlists_obj, f, indent=4)
     logging.info('Wrote file: ' + args.file)
 
 if __name__ == '__main__':
